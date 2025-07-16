@@ -1,6 +1,6 @@
-use ckb_testtool::ckb_types::core::{TransactionBuilder, TransactionView};
+use ckb_testtool::ckb_types::core::{TransactionBuilder};
 use ckb_testtool::ckb_types::packed::Transaction;
-use ckb_testtool::ckb_types::prelude::{AsTransactionBuilder, Builder, Entity};
+use ckb_testtool::ckb_types::prelude::{AsTransactionBuilder, Entity};
 use ckb_contract_minitest::cells::xudt_data::{XUDTData, XUDTDataCell};
 use ckb_contract_minitest::ContractUtil;
 

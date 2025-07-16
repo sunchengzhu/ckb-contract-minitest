@@ -1,8 +1,3 @@
-use ckb_testtool::ckb_types::core::TransactionBuilder;
-use ckb_testtool::ckb_types::prelude::Builder;
-use crate::cells::xudt_data::{XUDTData, XUDTDataCell};
-use crate::ContractUtil;
-use crate::prelude::ContextExt;
 
 #[test]
 fn test_contract_opt() {

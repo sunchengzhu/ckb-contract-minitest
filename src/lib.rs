@@ -251,7 +251,7 @@ impl ContractUtil {
         // lock script
         let lock_script = self.context.build_script_with_hash_type(&lock_contract, DEFAULT_TYPE, cell_tx.get_lock_arg().into()).unwrap();
 
-        let mut cell_output = {
+        let cell_output = {
             let mut cell_output = CellOutputBuilder::default()
                 .lock(lock_script);
             match type_contract {
@@ -292,7 +292,7 @@ impl ContractUtil {
         let data = Bytes::from(cell_tx.get_data());
 
         let mut output_cells: Vec<CellOutput> = tx_builder.outputs_with_data_iter()
-            .map(|(cell, data)| cell)
+            .map(|(cell, _data)| cell)
             .collect();
         if let Some(old_element) = output_cells.get_mut(replace_index) {
             *old_element = cell_output.build();
@@ -312,11 +312,11 @@ impl ContractUtil {
             return tx_builder;
         }
 
-        let mut witnessVec = tx_builder.data().witnesses().unpack();
-        if let Some(old_element) = witnessVec.get_mut(replace_index) {
+        let mut witness_vec = tx_builder.data().witnesses().unpack();
+        if let Some(old_element) = witness_vec.get_mut(replace_index) {
             *old_element = witness;
         } else {
-            witnessVec.push(witness);
+            witness_vec.push(witness);
             // println!("witness Index {} is out of bounds", replace_index);
             // return tx_builder;
         }
@@ -327,7 +327,7 @@ impl ContractUtil {
             .set_outputs(vec![])
             .outputs(output_cells)
             .set_witnesses(vec![])
-            .witnesses(witnessVec.pack())
+            .witnesses(witness_vec.pack())
             .build()
     }
 
@@ -373,7 +373,7 @@ impl ContractUtil {
 
 
         let mut output_cells: Vec<CellOutput> = tx_builder.outputs_with_data_iter()
-            .map(|(cell, data)| cell)
+            .map(|(cell, _data)| cell)
             .collect();
         output_cells.insert(set_index, cell_output.build());
 
@@ -381,15 +381,15 @@ impl ContractUtil {
         let mut output_data = tx_builder.data().raw().outputs_data().unpack();
         output_data.insert(set_index, data);
 
-        let mut witnessVec = tx_builder.data().witnesses().unpack();
-        witnessVec.insert(set_index, witness);
+        let mut witness_vec = tx_builder.data().witnesses().unpack();
+        witness_vec.insert(set_index, witness);
         tx_builder.as_advanced_builder()
             .set_outputs_data(vec![])
             .outputs_data(output_data.pack())
             .set_outputs(vec![])
             .outputs(output_cells)
             .set_witnesses(vec![])
-            .witnesses(witnessVec.pack())
+            .witnesses(witness_vec.pack())
             .build()
     }
 

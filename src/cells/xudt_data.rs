@@ -1,5 +1,5 @@
 use crate::cell_message::cell::MoleculeStructFlag;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use crate::impl_cell_methods;
 
 #[derive(PartialEq)]
