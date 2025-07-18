@@ -143,7 +143,7 @@ fn test_sudt_transfer_1_to_1() {
 
     tx = ct.context.complete_tx(tx);
     let ret = ct.context.should_be_passed(&tx, 1_000_000);
-    println!("SUDT transfer 1->1 ret:{:?}", ret);
+    println!("transfer 1->1 ret:{:?}", ret);
 }
 
 // 1 -> N
@@ -182,10 +182,10 @@ fn test_sudt_transfer_1_to_n() {
 
     tx = ct.context.complete_tx(tx);
     let ret = ct.context.should_be_passed(&tx, 1_000_000);
-    println!("SUDT transfer 1->N ret:{:?}", ret);
+    println!("transfer 1->N ret:{:?}", ret);
 }
 
-// N → 0
+// N -> 0
 #[test]
 fn test_sudt_burn_n_to_0_by_owner() {
 let mut ct = ContractUtil::new();
@@ -256,7 +256,70 @@ let mut ct = ContractUtil::new();
 
     tx = ct.context.complete_tx(tx);
     let ret = ct.context.should_be_passed(&tx, 1_000_000);
-    println!("SUDT burn N->0 by owner ret:{:?}", ret);
+    println!("burn N->0 by owner ret:{:?}", ret);
+}
+
+// 1 -> 0
+#[test]
+fn test_sudt_burn_1_to_0_by_owner() {
+    let mut ct = ContractUtil::new();
+    let sudt_type_contract = ct.deploy_contract("sudt");
+
+    let owner_lock_script = ct.context.build_script_with_hash_type(
+        &ct.alway_contract,
+        ScriptHashType::Data2,
+        Bytes::new(),
+    ).unwrap();
+    let owner_hash: [u8; 32] = owner_lock_script.calc_script_hash().unpack();
+
+    let sudt_output = CellOutput::new_builder()
+        .lock(
+            ct.context.build_script_with_hash_type(
+                &ct.alway_contract,
+                ScriptHashType::Data2,
+                Bytes::new(),
+            ).unwrap()
+        )
+        .type_(
+            Some(
+                ct.context.build_script_with_hash_type(
+                    &sudt_type_contract,
+                    ScriptHashType::Data2,
+                    Bytes::from(owner_hash.to_vec()),
+                ).unwrap()
+            ).pack()
+        )
+        .capacity((61 * 100_000_000u64).pack())
+        .build();
+
+    let amount: u128 = 1000;
+    let sudt_data = amount.to_le_bytes().to_vec();
+
+    let sudt_out_point = ct.context.create_cell(
+        sudt_output,
+        sudt_data.into(),
+    );
+    let sudt_input = CellInput::new_builder()
+        .previous_output(sudt_out_point)
+        .build();
+
+    let owner_input_out_point = ct.context.create_cell(
+        CellOutput::new_builder()
+            .lock(owner_lock_script.clone())
+            .capacity((61 * 100_000_000u64).pack())
+            .build(),
+        Bytes::new(), // owner cell can have empty data
+    );
+    let owner_input = CellInput::new_builder()
+        .previous_output(owner_input_out_point)
+        .build();
+
+    let mut tx = TransactionBuilder::default().build();
+    tx = tx.as_advanced_builder().input(sudt_input).input(owner_input).build();
+
+    tx = ct.context.complete_tx(tx);
+    let ret = ct.context.should_be_passed(&tx, 1_000_000);
+    println!("burn 1->0 by owner ret:{:?}", ret);
 }
 
 // N -> 1
@@ -300,7 +363,7 @@ fn test_sudt_transfer_n_to_1() {
 
     tx = ct.context.complete_tx(tx);
     let ret = ct.context.should_be_passed(&tx, 1_000_000);
-    println!("SUDT transfer N->1 ret:{:?}", ret);
+    println!("transfer N->1 ret:{:?}", ret);
 }
 
 // N -> N
@@ -349,5 +412,5 @@ fn test_sudt_transfer_n_to_n() {
 
     tx = ct.context.complete_tx(tx);
     let ret = ct.context.should_be_passed(&tx, 1_000_000);
-    println!("SUDT transfer N->N ret:{:?}", ret);
+    println!("transfer N->N ret:{:?}", ret);
 }
