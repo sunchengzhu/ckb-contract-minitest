@@ -1,0 +1,13 @@
+[package]
+name = "sudt"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+ckb-std = "0.13"
+
+[profile.release]
+panic = "abort"
+lto = true
+codegen-units = 1
+opt-level = "z"
