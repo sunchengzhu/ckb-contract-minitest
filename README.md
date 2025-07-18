@@ -5,7 +5,7 @@ Prepare the binary sudt contract file
 cd contracts/sudt
 rustup target add riscv64imac-unknown-none-elf
 cargo build --release --target riscv64imac-unknown-none-elf
-cp target/riscv64imac-unknown-none-elf/release/sudt ../../build/sudt
+cp -f target/riscv64imac-unknown-none-elf/release/sudt ../../build/release/sudt
 cd ../..
 ```
 
